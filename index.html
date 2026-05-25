@@ -67,10 +67,10 @@
             <h1 class="title is-1 publication-title">EpiSAM: Character Segmentation in Challenging Stone Inscriptions</h1>
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://www.linkedin.com/in/pratyush-jena-13b075170/">Pratyush Jena</a>,
+                <a href="https://www.linkedin.com/in/arnav-sharma-584841284">Arnav Sharma</a>,
               </span>
               <span class="author-block">
-                <a href="https://www.linkedin.com/in/arnav-sharma-584841284">Arnav Sharma</a>,
+                <a href="https://www.linkedin.com/in/pratyush-jena-13b075170/">Pratyush Jena</a>,
               </span>
               <span class="author-block">
                 <a href="https://amaljoseph.github.io/">Amal Joseph</a>,</span>
@@ -115,16 +115,20 @@
                   </a>
                 </span> -->
                 <!-- Code Link. -->
+
+
+               <!-- # Since we are not realeasing code. If we do, we can uncomment this block and add the link to the code repository. -->
+
                 <span class="link-block">
                   <a href="https://github.com/ihdia/episam"
                      class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
-                        <i class="fab fa-github"></i>
+                        <i class="fas fa-file-pdf"></i>
                     </span>
-                    <span>Code</span>
+                    <span>Paper</span>
                     </a>
                 </span>
-                <!-- Dataset Link. ********************************************************************************-->
+
                 <span class="link-block">
                   <a href="#dataset"
                      class="external-link button is-normal is-rounded is-dark">
@@ -152,13 +156,17 @@
   <section class="hero teaser">
     <div class="container is-centered">
       <div class="hero-body has-text-centered">
-        <img src="static/images/website_data_example-min.png" alt="">
+        
+        <img src="static/images/Char Data Intro.jpg" alt="" style="width: 50vw;">
+
         <!-- <video id="teaser" autoplay muted loop playsinline height="100%">
           <source src="./static/videos/1711_final_2mins.mp4" type="video/mp4">
         </video> -->
         <h2 class="subtitle has-text-centered">
-          Sample images and their corresponding character masks from the extended Shilalekhya Inscription dataset. 
-          Notice the difficulty distinguishing the shallow handwritten text etching from the background stone texture with naked eye.
+          Sample images and their corresponding character masks from our dataset.
+          Notice the difficulty distinguishing the shallow handwritten text etching from the
+          background stone texture with naked eye. For clarity, the character masks are
+          shown as boundary overlays.
         </h2>
       </div>
     </div>
@@ -176,11 +184,13 @@
           <div class="content has-text-justified">
             <p>
                 Stone inscriptions are invaluable sources of historical and linguistic knowledge, yet their automated analysis remains a major challenge due to surface irregularities, erosion, and low visual contrast. 
-                Conventional document and handwriting analysis techniques fail to perform well in these scenarios. 
-                In this work, we propose character detection as a core strategy for robust inscription analysis and propose <b>EpiSAM</b>, a point-guided transformer framework for character segmentation in stone inscriptions. 
-                Our approach leverages visual representation and prompt-based localization strengths of the Segment Anything Model (SAM) to produce fine-grained character masks. 
-                Furthermore, we extend the <i><a href="https://ihdia.iiit.ac.in/shilalekhya-binarization", target="_blank">Shilalekhya Inscription Dataset</a></i>, which comprises of stone inscription images and binary text masks by adding detailed character polygonal annotations, creating a new benchmark for epigraphic analysis. 
-                Experimental results demonstrate that <b>EpiSAM</b> achieves accurate character segmentation in highly degraded inscriptions.
+                Conventional document and handwriting analysis techniques fail to perform well in these scenarios. In this work, we propose character detection as
+                a core strategy for robust inscription analysis. We introduce EpiSAM, a prompt-guided transformer framework for character segmentation in
+                stone inscriptions. Rather than treating characters in isolation, EpiSAM employs a novel neighbor-aware strategy, explicitly predicting adjacent
+                characters alongside the target. These contextual cues resolves boundary ambiguities, improving mask generation and enabling more accurate
+                character segmentation. Furthermore, we expand an existing stone inscription dataset by adding dense polygonal annotations for characters,
+                thereby enabling comprehensive research on Southeast Asian epigraphy. Experimental results shows that EpiSAM achieves consistent improve-
+                ments over existing baselines, while also exhibiting strong zero-shot generalization in challenging epigraphic scenarios.
             </p>
           </div>
         </div>
@@ -231,27 +241,30 @@
       <!-- Network Architecture . -->
       <div class="columns is-centered has-text-centered">
         <div class="column is-full">
-          <h2 class="title is-3">Proposed Approach: EpiSAM</h2>
+          <h2 class="title is-3">Proposed Approach: Shilalekhya Binarization</h2>
 
           <div class="content has-text-justified">
             <p>
-              We propose <b>EpiSAM</b>, a point-guided transformer architecture for character segmentation in stone inscriptions. 
-              Our method leverages the strong visual representation and prompt-based localization capabilities of the Segment Anything Model (SAM) to produce fine-grained masks guided by sparse prompts. 
+              Rather than predicting each character in isolation, we exploit the structured nature of inscriptions, 
+              where characters appear in locally coherent spatial sequences. We reformulate character segmentation as a localized, 
+              neighbor-aware prediction task: estimating a target character jointly with its immediate left and right neighbors.
             </p>
             <p>
+              This formulation introduces strong contextual constraints that reduce boundary ambiguities and improve separation between 
+              adjacent characters, especially under heavy noise and texture ambiguity. By leveraging local spatial continuity, the model 
+              achieves more reliable instance-level character segmentation without requiring any explicit line-level modeling.
+            </p>
+            <p>
+              Based on this formulation, we propose <b>EpiSAM</b>, a prompt-guided transformer framework that integrates neighbor-aware contextual awareness for robust character segmentation.
+              Our method leverages the strong visual representation and prompt-based localization capabilities of the Segment Anything Model (SAM) to produce fine-grained masks guided by sparse prompts. 
+            </p>
+            <!-- <p>
               To evaluate our approach, we create a benchmark dataset by annotating precise character-level polygons for historical stone inscriptions in Kannada script (a southern Indian script). 
               We extend the <a href="https://ihdia.iiit.ac.in/shilalekhya-binarization/" target="_blank"><i>Shilalekhya Inscription Binarization Dataset</i></a> of heavily degraded Indic stone inscriptions.  
               These inscriptions span diverse historical periods, styles of etching, physical conditions and the background surface is visually indistinguishable from noise. 
               This extension establishes a new benchmark for research in computational epigraphy.
-            </p>
+            </p> -->
           </div>
-          <figure>
-            <img src="./static/images/pipeline.jpeg" alt="method" style="width: 100%;" />
-            <!-- <figcaption>
-              Our Character-Context-Aware Patching produce patches of good context with a consistent amount of textual information across the patches. 
-              Notice the character height is similar across the patches relative to the patch dimensions with our patching method.
-            </figcaption> -->
-          </figure>
         </div>
       </div>
     </div>
@@ -321,6 +334,9 @@
 
 
 
+
+
+
     </div>
   </section> -->
   <!-- END ---   SECTION - ARCHITECTURE -->
@@ -345,8 +361,9 @@
       <div class="columns is-centered">
         <div class="column is-full">
           <p>
-            Qualitative comparison of character segmentation results. From left to right: predictions from our proposed <b>EpiSAM</b>, <i>YOLOv8-Seg</i>, <i></i>YOLOv11-Seg</i>, <i></i>YOLOv12-Seg</i>, <i></i>CRAFT</i>. 
-            The character masks produced by EpiSAM are noticeably more accurate, complete, and resilient to surface fractures, erosion, and variations in text density.
+            Qualitative comparison of character segmentation against the strongest baseline (YOLOv11x-Seg).
+            Under severe degradation and surface erosion, <b>EpiSAM</b> produces tighter and more precise character masks, 
+            resulting in improved instance separation in densely packed inscriptions.
           </p>
         </div>
       </div>
@@ -354,8 +371,8 @@
       <div class="columns is-centered has-text-centered">
         <div class="column">
           <figure>
-            <img src="./static/images/results.png"
-              alt="Example inference result from various models." style="width: 90%;" />
+            <img src="./static/images/prediction_comparison_4rows.jpg"
+              alt="Example inference result from various models." style="width: 70%;" />
             <figcaption style="font-style: italic;">
               
             </figcaption>
@@ -363,6 +380,8 @@
         </div>
       </div>
     </div>
+
+    
 </section>
 
 
@@ -418,11 +437,11 @@
 
       <div class="columns is-centered has-text-centered">
         <div class="column is-full">
-          <p><b>EpiSAM</b> outperforms existing segmentation methods across all metrics, demonstrating improved localization and boundary precision in degraded inscriptions.</p>
+          <p><b>EpiSAM</b> demonstrates superior instance-level segmentation performance across metrics.</p>
           <figure>
-            <img src="./static/images/results_table.png"
-              alt="Comparative evaluation of ShilaLekhya against baseline models using benchmark datasets."
-              style="width: 50%;" />
+            <img src="./static/images/quant_results.png"
+              alt="Quantitative results for character segmentation."
+              style="width: 70%;" />
             <!-- <figcaption> <b>EpiSAM</b> outperforms existing segmentation methods across all metrics, demonstrating improved localization and boundary precision in degraded inscriptions.</figcaption> -->
           </figure>
         </div>
@@ -430,6 +449,38 @@
     </div>
   </section>
 <!-- END ---   SECTION - QUANTITATIVE RESULTS -->
+
+  <!-- START ---   SECTION - ZERO SHOT RESULTS -->
+  <section class="section" id="zero-shot-results">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full has-text-centered">
+          <h2 class="title is-3">Zero Shot Results</h2>
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+          <p>
+            Zero-shot character segmentation results of <b>EpiSAM</b> on (from top to bottom) Roman, Brahmi 
+              and Thai inscriptions. 
+              Even when characters are partially missing or severely eroded, the model produces spatially coherent and 
+              well-separated character masks.
+          </p>
+        </div>
+      </div>
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <figure>
+            <img src="./static/images/zero_shot.jpg"
+              alt="Zero-shot results for EpiSAM." style="width: 60%;" />
+
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- END ---   SECTION - ZERO SHOT RESULTS -->
 
   <!-- START ---   SECTION - QUANTITATIVE RESULTS -->
   <section class="section" id="dataset">
