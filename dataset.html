@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="EpiSAM Dataset Samples: Character, Line, and Binarization Visualizations">
+  <meta name="keywords" content="EpiSAM, Shilalekhya, Inscriptions, Dataset Samples, Character Segmentation, Line Segmentation, Binarization">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EpiSAM - Dataset Samples</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/1630643899289.jpeg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+
+  <style>
+    .sample-slide {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .sample-slide.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .carousel-container {
+      position: relative;
+      padding: 0 40px;
+    }
+
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(54, 54, 54, 0.85);
+      color: #ffffff;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      z-index: 10;
+    }
+
+    .nav-arrow:hover {
+      background-color: rgba(0, 0, 0, 0.95);
+      color: #ffffff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .nav-arrow:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .nav-arrow.prev {
+      left: -10px;
+    }
+
+    .nav-arrow.next {
+      right: -10px;
+    }
+
+    .dot-indicators {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #ccc;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .dot:hover {
+      transform: scale(1.2);
+    }
+
+    .dot.active {
+      background-color: #3273dc;
+    }
+
+    .card-image-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: #fafafa;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-image-box img {
+      width: 100%;
+      border-radius: 4px;
+      object-fit: contain;
+      max-height: 450px;
+      background-color: #fff;
+    }
+
+    .image-label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #363636;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <a class="navbar-item" href="index.html">
+          <span class="icon">
+            <i class="fas fa-home"></i>
+          </span>
+          <span style="margin-left: 5px;">Home</span>
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More Research
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://ihdia.iiit.ac.in/episam/">EpiSAM</a>
+            <a class="navbar-item" href="https://ihdia.iiit.ac.in/shilalekhya-binarization/">Shilalekhya Binarization</a>
+            <a class="navbar-item" href="https://ihdia.iiit.ac.in/">IHDIA Group</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- SECTION - TITLE -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">EpiSAM: Dataset</h1>
+            <h2 class="subtitle is-4" style="margin-top: 10px; color: #555;">
+            </h2>
+            <div class="publication-links">
+              <!-- <span class="link-block">
+                <a href="index.html" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-arrow-left"></i>
+                  </span>
+                  <span>Back to Overview</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href="https://drive.google.com/drive/folders/1W7316UtwO4pCDzrv3uPX9uIcvmxexJdo?usp=sharing" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                  <span class="icon">
+                    <i class="fas fa-download"></i>
+                  </span>
+                  <span>Download Dataset</span>
+                </a>
+              </span>
+            </div>
+
+            <!-- DATASET CONTENTS BOX -->
+            <div class="box mt-5 mb-4" style="max-width: 650px; margin: 20px auto 0 auto; border: 1px solid #e0e0e0; background-color: #fafafa; border-radius: 10px; padding: 1.25rem;">
+              <p class="title is-5 has-text-centered mb-3" style="color: #363636; letter-spacing: 0.2px;">
+                <i class="fas fa-cubes mr-2" style="color: #3273dc;"></i>What the Dataset Contains
+              </p>
+              <div class="tags are-medium is-centered" style="justify-content: center; gap: 8px; margin-bottom: 0;">
+                <span class="tag is-dark is-rounded" style="padding: 0.6em 1.1em; font-weight: 500;">
+                  <i class="fas fa-image" style="margin-right: 6px; color: #64b5f6;"></i> Inscription Images
+                </span>
+                <span class="tag is-dark is-rounded" style="padding: 0.6em 1.1em; font-weight: 500;">
+                  <i class="fas fa-adjust" style="margin-right: 6px; color: #81c784;"></i> Binarised Images
+                </span>
+                <span class="tag is-dark is-rounded" style="padding: 0.6em 1.1em; font-weight: 500;">
+                  <i class="fas fa-font" style="margin-right: 6px; color: #ffb74d;"></i> Character Masks
+                </span>
+                <span class="tag is-dark is-rounded" style="padding: 0.6em 1.1em; font-weight: 500;">
+                  <i class="fas fa-align-left" style="margin-right: 6px; color: #ba68c8;"></i> Line Masks
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION - CAROUSEL SLIDES -->
+  <section class="section">
+    <div class="container is-max-widescreen">
+
+      <div class="carousel-container">
+        <!-- Floating Middle-Height Arrow Navigation Buttons -->
+        <button class="nav-arrow prev" aria-label="Previous Slide" onclick="changeSlide(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <button class="nav-arrow next" aria-label="Next Slide" onclick="changeSlide(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- SLIDE 1 -->
+        <div class="sample-slide active" id="slide-0">
+          <div class="has-text-centered mb-5">
+            <h3 class="title is-4">Agara 1363CE Kameyanayaka's Donation Inscription</h3>
+          </div>
+
+          <div class="columns is-multiline">
+            <!-- Whole / Original Image -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Original Image</div>
+                <img src="./static/images/webpage_images/Agara 1363CE Kameyanayaka's Donation Inscription_image.png"
+                     alt="Agara Inscription Original Image">
+              </div>
+            </div>
+
+            <!-- Binary Image -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Binary Image</div>
+                <img src="./static/images/webpage_images/Agara 1363CE Kameyanayaka's Donation Inscription.png"
+                     alt="Agara Inscription Binary">
+              </div>
+            </div>
+
+            <!-- Character Viz -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Character Segmentation</div>
+                <img src="./static/images/webpage_images/Agara 1363CE Kameyanayaka's Donation Inscription_char_viz.png"
+                     alt="Agara Inscription Character Segmentation">
+              </div>
+            </div>
+
+            <!-- Line Viz -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Line Segmentation</div>
+                <img src="./static/images/webpage_images/Agara 1363CE Kameyanayaka's Donation Inscription_line_viz.png"
+                     alt="Agara Inscription Line Segmentation">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="sample-slide" id="slide-1">
+          <div class="has-text-centered mb-5">
+            <h3 class="title is-4">Bommenahalli 1400CE Immadi Bukkana Odeyar's Donation Inscription</h3>
+          </div>
+
+          <div class="columns is-multiline">
+            <!-- Whole / Original Image -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Original Image</div>
+                <img src="./static/images/webpage_images/Bommenahalli 1400CE Immadi Bukkana Odeyar's Donation Inscription (Not Documented Before)_image.png"
+                     alt="Bommenahalli Inscription Original Image">
+              </div>
+            </div>
+
+            <!-- Binary Image -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Binary Image</div>
+                <img src="./static/images/webpage_images/Bommenahalli 1400CE Immadi Bukkana Odeyar's Donation Inscription (Not Documented Before).png"
+                     alt="Bommenahalli Inscription Binary">
+              </div>
+            </div>
+
+            <!-- Character Viz -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Character Segmentation</div>
+                <img src="./static/images/webpage_images/Bommenahalli 1400CE Immadi Bukkana Odeyar's Donation Inscription (Not Documented Before)_char_viz.png"
+                     alt="Bommenahalli Inscription Character Segmentation">
+              </div>
+            </div>
+
+            <!-- Line Viz -->
+            <div class="column is-3">
+              <div class="card-image-box has-text-centered">
+                <div class="image-label">Line Segmentation</div>
+                <img src="./static/images/webpage_images/Bommenahalli 1400CE Immadi Bukkana Odeyar's Donation Inscription (Not Documented Before)_line_viz.png"
+                     alt="Bommenahalli Inscription Line Segmentation">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dot Indicators -->
+        <div class="dot-indicators">
+          <span class="dot active" onclick="goToSlide(0)"></span>
+          <span class="dot" onclick="goToSlide(1)"></span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION - CITATION -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">Citation</h2>
+      <p>If you use our dataset in your research, please cite the following papers:</p>
+
+      <pre><code>@misc{sharma2026episamcharactersegmentationchallenging,
+      title={EpiSAM: Character Segmentation in Challenging Stone Inscriptions}, 
+      author={Arnav Sharma and Pratyush Jena and Amal Joseph and Ravi Kiran Sarvadevabhatla},
+      year={2026},
+      eprint={2606.28859},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2606.28859}, 
+}
+@inproceedings{Jena_2025, series={ICVGIP 2025},
+   title={Unveiling Text in Challenging Stone Inscriptions: A Character-Context-Aware Patching Strategy for Binarization},
+   url={http://dx.doi.org/10.1145/3774521.3774539},
+   DOI={10.1145/3774521.3774539},
+   booktitle={Proceedings of the Sixteen Indian Conference on Computer Vision, Graphics and Image Processing},
+   publisher={ACM},
+   author={Jena, Pratyush and Joseph, Amal and Sharma, Arnav and Sarvadevabhatla, Ravi Kiran},
+   year={2025},
+   month=Dec, pages={1–9},
+   collection={ICVGIP 2025} }
+</code></pre>
+    </div>
+  </section>
+
+
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 2;
+
+    function updateSlide() {
+      for (let i = 0; i < totalSlides; i++) {
+        const slide = document.getElementById(`slide-${i}`);
+        const dots = document.querySelectorAll('.dot');
+        if (i === currentSlide) {
+          slide.classList.add('active');
+          if (dots[i]) dots[i].classList.add('active');
+        } else {
+          slide.classList.remove('active');
+          if (dots[i]) dots[i].classList.remove('active');
+        }
+      }
+    }
+
+    function changeSlide(direction) {
+      currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+      updateSlide();
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlide();
+    }
+
+    // Keyboard Arrow Keys Navigation
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'ArrowLeft') {
+        changeSlide(-1);
+      } else if (event.key === 'ArrowRight') {
+        changeSlide(1);
+      }
+    });
+  </script>
+
+
+
+  <!-- START --- SECTION - ACKNOWLEDGEMENT -->
+  <section class="section" id="acknowledgement">
+    <div class="container is-max-desktop">
+      <h2 class="title">Acknowledgement</h2>
+
+      <p>
+        We sincerely acknowledge <strong>The Mythic Society Bengaluru</strong>
+        for providing the inscription images used in this work. These resources are part of the
+        <em>Inscriptions 3D Digital Conservation Project</em>, an initiative aimed at preserving and
+        digitizing valuable epigraphic heritage.
+      </p>
+
+      <p>
+        For more information about the project, please visit:
+        <a href="https://mythicsociety.github.io/AksharaBhandara/" target="_blank">
+          Akshara Bhandara – Inscriptions 3D Digital Conservation Project
+        </a>.
+      </p>
+
+    </div>
+  </section>
+  <!-- END --- SECTION - ACKNOWLEDGEMENT -->
+
+    <!-- FOOTER -->
+  <footer class="footer">
+    <div align="center" class="container">
+      <div class="columns is-centered">
+        <div class="content is-8">
+          This website template is borrowed from <a href="https://github.com/nerfies/nerfies.github.io">nerfies</a>.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
