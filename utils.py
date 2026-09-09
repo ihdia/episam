@@ -129,6 +129,42 @@ class SequentialCharacterLoss(torch.nn.Module):
         return total_loss, loss_dict
 
 
+def compute_inter_line_overlap(pred_masks_by_line, line_overlap_weight=1.0):
+    """Use soft probability approach (consistent with neighbor overlap)."""
+    line_nums = list(pred_masks_by_line.keys())
+
+    if len(line_nums) < 2 or line_overlap_weight == 0:
+        device = next(iter(pred_masks_by_line.values()))[0].device if pred_masks_by_line else 'cpu'
+        return torch.tensor(0.0, device=device), 0.0
+
+    line_union_masks = {}
+    for line_num in line_nums:
+        char_logits_list = pred_masks_by_line[line_num]
+        stacked = torch.cat(char_logits_list, dim=0)
+        soft_masks = torch.sigmoid(stacked)
+        # Use mean instead of max to preserve soft information
+        line_union = soft_masks.mean(dim=0, keepdim=True)
+        line_union_masks[line_num] = line_union
+
+    total_penalty = torch.tensor(0.0, device=line_union_masks[line_nums[0]].device)
+    num_pairs = 0
+
+    sorted_lines = sorted(line_nums)
+    for i in range(len(sorted_lines)):
+        for j in range(i + 1, len(sorted_lines)):
+            mask_i = line_union_masks[sorted_lines[i]]
+            mask_j = line_union_masks[sorted_lines[j]]
+            # Use mean overlap (like neighbor penalty)
+            overlap = (mask_i * mask_j).mean()
+            total_penalty = total_penalty + overlap
+            num_pairs += 1
+
+    if num_pairs > 0:
+        avg_penalty = line_overlap_weight * total_penalty / num_pairs
+    else:
+        avg_penalty = torch.tensor(0.0, device=total_penalty.device)
+
+    return avg_penalty, avg_penalty.item()
 
 def compute_char_vs_other_lines_penalty(pred_char_mask, char_line_num, gt_line_masks,
                                          line_numbers_available, line_overlap_weight=1.0):
