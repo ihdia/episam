@@ -12,7 +12,7 @@
   <img src="https://profile-counter.glitch.me/EpiSAM/count.svg" alt="Visitor Count">
 </p>
 
-<h3 align="center">💥 <b>Accepted at ICDAR 2026 (CORE A)</b> 💥</h3>
+<h3 align="center"><b>Accepted at ICDAR 2026 (CORE A)</b></h3>
 
 This repository contains the codebase for dataset preprocessing, training, and evaluation of **EpiSAM** (Segment Anything Model fine-tuned for historical epigraphy and character segmentation).
 
