@@ -173,7 +173,7 @@ python 2_hop_graphs_lines.py \
 * `--threshold`: Threshold $t$ for edge classification (default: `0.4`).
 
 
-## Citation
+## 7. Citation
 
 If you use our dataset in your research, please cite the following papers:
 
@@ -208,7 +208,9 @@ collection={ICVGIP 2025}
 }
 ```
 
-## Acknowledgement
+---
+
+## 8. Acknowledgement
 
 We sincerely acknowledge **The Mythic Society Bengaluru** for providing the inscription images used in this work. These resources are part of the *Inscriptions 3D Digital Conservation Project*, an initiative aimed at preserving and digitizing valuable epigraphic heritage.
 
