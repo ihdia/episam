@@ -1,7 +1,6 @@
 # EpiSAM: Character Segmentation in Challenging Stone Inscriptions
 
 <p align="center">
-  <h3>💥 <b>Accepted at ICDAR 2026 (CORE A)</b> 💥</h3>
   <a href="https://arxiv.org/pdf/2606.28859">
     <img src="https://img.shields.io/badge/Paper-PDF-red?style=flat&logo=adobeacrobatreader&logoColor=white"></a>
   <a href="https://ihdia.iiit.ac.in/episam/">
@@ -11,6 +10,10 @@
   <a href="https://ihdia.iiit.ac.in/episam/dataset.html">
     <img src="https://img.shields.io/badge/Dataset-Website-green?style=flat&logo=Google%20chrome&logoColor=white"></a>
   <img src="https://profile-counter.glitch.me/EpiSAM/count.svg" alt="Visitor Count">
+</p>
+
+<p align="center">
+  <h3>💥 <b>Accepted at ICDAR 2026 (CORE A)</b> 💥</h3>
 </p>
 
 This repository contains the codebase for dataset preprocessing, training, and evaluation of **EpiSAM** (Segment Anything Model fine-tuned for historical epigraphy and character segmentation).
@@ -27,7 +30,7 @@ This repository contains the codebase for dataset preprocessing, training, and e
 
 ---
 
-## 1. ⚙️ Environment Setup
+## 1. Environment Setup
 
 You can set up the required Conda environment using the provided `environment.yml` file.
 
@@ -41,7 +44,7 @@ conda activate episam
 
 ---
 
-## 2. 📂 Dataset Directory Structure
+## 2. Dataset Directory Structure
 
 Ensure your dataset directory structure follows this format:
 
@@ -61,7 +64,7 @@ episam_dataset/
 
 ---
 
-## 3. 🛠️ Dataset Preprocessing
+## 3. Dataset Preprocessing
 
 Before training or evaluation, process the dataset to generate `.npz` mask arrays and master JSON index files. You must run the `prepare_dataset.py` script **twice**—once for the `train` split and once for the `val` split.
 
@@ -99,7 +102,7 @@ python dataset_scripts/prepare_dataset.py \
 
 ---
 
-## 4. 🏋️ Training the Model
+## 4. Training the Model
 
 Train the model using `train.py`. Pass the pretrained SAM weights checkpoint (`--checkpoint`) and the generated training & validation index JSON files.
 
@@ -126,7 +129,7 @@ python train.py \
 
 ---
 
-## 5. 📊 Evaluating the Model
+## 5. Evaluating the Model
 
 To evaluate a trained checkpoint on your validation set and save visualizations:
 
@@ -142,7 +145,7 @@ python evaluate.py \
 
 ---
 
-## 6. 🕸️ Line Grouping using 2-Hop Graph Classification (`2_hop_graphs_lines.py`)
+## 6. Line Grouping using 2-Hop Graph Classification (`2_hop_graphs_lines.py`)
 
 Note: This is not a part of the EpiSAM paper, but is something we used in the demo application. The demo was accepted as part of the Demo track at the DAS workshop conducted within ICDAR '26. Refer to EpiSAM_DAS.pdf for more details.
 
