@@ -25,6 +25,8 @@ This repository contains the codebase for dataset preprocessing, training, and e
 4. [Training the Model](#4-training-the-model)
 5. [Evaluating the Model](#5-evaluating-the-model)
 6. [Line Grouping using 2-Hop Graph Classification](#6-line-grouping-using-2-hop-graph-classification)
+7. [Citation](#7-citation)
+8. [Acknowledgement](#8-acknowledgement)
 
 ---
 
