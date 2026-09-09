@@ -145,9 +145,10 @@ python evaluate.py \
 
 ---
 
-## 6. Line Grouping using 2-Hop Graph Classification (`2_hop_graphs_lines.py`)
+## 6. Line Segmentation using 2-Hop Graph Classification
+Note: This is not a part of the EpiSAM paper, but is something we used in the demo application. The demo was accepted as part of the Demo track at the DAS workshop conducted within ICDAR '26. Refer to [EpiSAM_DAS.pdf](EpiSAM_DAS.pdf) for more details.
+<img width="1515" height="414" alt="image" src="https://github.com/user-attachments/assets/80309d6a-ed97-4fdd-9f62-667320bbda5d" />
 
-Note: This is not a part of the EpiSAM paper, but is something we used in the demo application. The demo was accepted as part of the Demo track at the DAS workshop conducted within ICDAR '26. Refer to EpiSAM_DAS.pdf for more details.
 
 The `2_hop_graphs_lines.py` script constructs a 2-hop graph over character predictions and performs edge classification using a heuristic similarity threshold with common-neighbour veto to group characters into text lines.
 
