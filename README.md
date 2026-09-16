@@ -9,8 +9,10 @@
     <img src="https://img.shields.io/badge/Dataset-HuggingFace-blue?style=flat&logo=huggingface&logoColor=yellow"></a>
   <a href="https://ihdia.iiit.ac.in/episam/dataset.html">
     <img src="https://img.shields.io/badge/Dataset-Website-green?style=flat&logo=Google%20chrome&logoColor=white"></a>
+  <a href="https://huggingface.co/keyfinder08/EpiSAM_Inscriptions_Project"> <img src="https://img.shields.io/badge/Weights-HuggingFace-yellow?style=flat&logo=huggingface&logoColor=black"> </a>
   <img src="https://komarev.com/ghpvc/?username=keyfinder08-episam&label=VISITORS&color=0e75b6&style=flat" alt="Visitor Count">
 </p>
+
 
 <h3 align="center"><b>Accepted at ICDAR 2026 (CORE A)</b></h3>
 
