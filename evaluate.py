@@ -205,22 +205,20 @@ def get_random_point_in_bbox(bbox, image_size=1024):
 
 
 def evaluate(sam, eval_loader, device, output_dir,
-             per_char_visualization=False, pred_iou_threshold=0.0,
+             per_char_visualization=False, nms_ios_threshold=0.7,
              use_random_bbox_point=False):
-    """Evaluate model and save visualizations and predicted masks."""
+    """Evaluate model and save visualizations and predicted masks.
+
+    Masks are selected per prompt by best dice against GT, then NMS is applied.
+    Only post-NMS metrics are reported.
+    """
     sam.eval()
     os.makedirs(output_dir, exist_ok=True)
     feature_dir = os.path.join(output_dir, "feature_maps")
     os.makedirs(feature_dir, exist_ok=True)
 
-    # Accumulators for aggregation across images
-    # Each entry: dict with keys fg_iou, fg_dice, mean_iou, mean_dice
-    per_image_results = {          # strategy -> list of per-image metric dicts
-        "dice_pre_nms":    [],
-        "prediou_pre_nms": [],
-        "dice_post_nms":   [],
-        "prediou_post_nms": [],
-    }
+    # Per-image metric dicts (best-by-dice, after NMS)
+    per_image_results = []
     
     with torch.no_grad():
         for idx, batch in enumerate(tqdm(eval_loader, desc="Evaluating")):
@@ -247,15 +245,7 @@ def evaluate(sam, eval_loader, device, output_dir,
                 bbox_prompts_i = bbox_prompts[i] if bbox_prompts else None
 
                 pred_masks_list = []        # best-by-dice
-                pred_masks_low_list = []    # low-res tensors stored as numpy
-                target_masks_1024_list = []
-
-                pred_masks_prediou_list = []   # best-by-pred-iou (after threshold filter)
-                confidences_prediou_list = []
-                # GT masks that survive the pred-iou threshold (parallel to pred_masks_prediou_list)
-                gt_masks_prediou_list = []
-
-                confidences_list = []
+                confidences_list = []       # predicted IoU of the chosen mask (used for NMS ranking / viz)
                 
                 # Denormalize image
                 mean = sam.pixel_mean.to(device).view(-1, 1, 1)
@@ -272,7 +262,6 @@ def evaluate(sam, eval_loader, device, output_dir,
                 
                 # Generate predictions
                 for j in range(len(points_i)):
-                    # prompt_point = points_i[j].unsqueeze(0).unsqueeze(0).to(device)
                     if use_random_bbox_point and bbox_prompts_i is not None:
                         bbox = bbox_prompts_i[j].cpu().numpy()
                         random_point = get_random_point_in_bbox(bbox, image_size=1024)
@@ -301,68 +290,28 @@ def evaluate(sam, eval_loader, device, output_dir,
                         multimask_output=True,
                     )
                     
-                    # For best-by-dice
+                    # Best-by-dice
                     dice_scores = torch.stack([1 - dice_loss(m, target_mask) 
                                              for m in pred_masks_low.squeeze(0)])
                     best_idx = torch.argmax(dice_scores)
-
-                    # For best-by-predicted-iou
-                    best_prediou_idx = torch.argmax(pred_iou[0]).item()
                     
                     pred_mask_1024 = sam.postprocess_masks(
                         pred_masks_low[:, best_idx:best_idx+1, :, :],
                         input_size=images[i].shape[-2:],
                         original_size=images[i].shape[-2:]
                     )
-
-                    # For predicted IoU selection
-                    pred_mask_1024_prediou = sam.postprocess_masks(
-                        pred_masks_low[:, best_prediou_idx:best_prediou_idx+1, :, :],
-                        input_size=images[i].shape[-2:],
-                        original_size=images[i].shape[-2:]
-                    )
                     
                     # Convert to numpy immediately (move off GPU)
                     pred_mask_np = (pred_mask_1024 > sam.mask_threshold).squeeze().cpu().numpy()
-                    pred_mask_np_prediou = (pred_mask_1024_prediou > sam.mask_threshold).squeeze().cpu().numpy()
-
-                    # best-by-dice: always kept
                     pred_masks_list.append(pred_mask_np)
 
-                    # best-by-pred-iou: filter by threshold
-                    raw_prediou_score = pred_iou[0, best_prediou_idx].item()
-                    if raw_prediou_score >= pred_iou_threshold:
-                        pred_masks_prediou_list.append(pred_mask_np_prediou)
-                        confidences_prediou_list.append(raw_prediou_score)
-                        # Store GT mask paired with this prediction
-                        target_1024_np = F.interpolate(
-                            target_mask, (1024, 1024), mode='bilinear', align_corners=False
-                        ).squeeze().cpu().numpy()
-                        gt_masks_prediou_list.append((target_1024_np > 0.5))
-
-                    confidence = pred_iou[0, best_idx].item()
-                    # print confidence
-                    # print("*"*20)
-                    # print(f"Confidence: {confidence}")  
-                    confidences_list.append(confidence)
-
-                    # Upsampled target for NMS-metrics path (best-by-dice)
-                    target_1024 = F.interpolate(
-                        target_mask, (1024, 1024), mode='bilinear', align_corners=False
-                    ).to(device)
-                    target_masks_1024_list.append((target_1024 > 0.5).squeeze().cpu().numpy())
-
-                    # Store pred low-res as numpy for post-NMS metric reuse
-                    pred_masks_low_list.append(pred_mask_np)
+                    confidences_list.append(pred_iou[0, best_idx].item())
 
                     # Delete GPU tensors immediately
-                    del pred_masks_low, pred_iou, sparse_emb, dense_emb, pred_mask_1024, target_1024
-                    del pred_mask_1024_prediou
+                    del pred_masks_low, pred_iou, sparse_emb, dense_emb, pred_mask_1024
                     torch.cuda.empty_cache()
 
-                # points_np = points_i.cpu().numpy()
-                if use_random_bbox_point is not None and bbox_prompts_i is not None:
-                    print("why is it here")
+                if random_points:
                     points_np = np.stack([p.cpu().numpy() for p in random_points])
                 else:
                     points_np = points_i.cpu().numpy()
@@ -370,7 +319,7 @@ def evaluate(sam, eval_loader, device, output_dir,
                 if bbox_prompts_i is not None:
                     bbox_np = [b.cpu().numpy() for b in bbox_prompts_i]
 
-                # --- Confidence-based border visualization (best-by-dice) ---
+                # --- Confidence-based border visualization ---
                 confs = np.array(confidences_list)
                 if len(confs) > 1:
                     conf_min, conf_max = confs.min(), confs.max()
@@ -379,25 +328,19 @@ def evaluate(sam, eval_loader, device, output_dir,
                 else:
                     norm_confs = np.ones_like(confs)
 
-                # ----------------------------------------------------------------
-                # Per-image metrics  (best-by-dice, BEFORE NMS)
-                # ----------------------------------------------------------------
-                m_dice_pre = calculate_metrics(
-                    pred_masks_list, gt_masks_list
-                )
-                per_image_results["dice_pre_nms"].append(m_dice_pre)
+                # --- NMS on best-by-dice masks ---
+                keep_indices = mask_nms_ios(pred_masks_list, confidences_list, ios_threshold=nms_ios_threshold)
+                pred_masks_list_nms = [pred_masks_list[k] for k in keep_indices]
+                norm_confs_nms = norm_confs[keep_indices]
+                points_np_nms = points_np[keep_indices]
+                bbox_np_nms = [bbox_np[k] for k in keep_indices] if bbox_np is not None else None
 
-                # ----------------------------------------------------------------
-                # Per-image metrics  (best-by-pred-iou, BEFORE NMS)
-                # pred_masks_prediou_list already filtered by pred_iou_threshold;
-                # gt_masks_prediou_list contains only matched GT masks;
-                # unmatched GTs (filtered out) are counted as FN via the full
-                # gt_masks_list passed below.
-                # ----------------------------------------------------------------
-                m_prediou_pre = calculate_metrics(
-                    pred_masks_prediou_list, gt_masks_list
-                )
-                per_image_results["prediou_pre_nms"].append(m_prediou_pre)
+                # --- Per-image metrics (best-by-dice, AFTER NMS) ---
+                m_post = calculate_metrics(pred_masks_list_nms, gt_masks_list)
+                per_image_results.append(m_post)
+
+                print(f"  [Image {idx:04d}] dice-select, post-NMS: "
+                      f"iou={m_post['mean_iou']:.4f} dice={m_post['mean_dice']:.4f}")
 
                 # Compose GT and prompt images
                 gt_img = create_overlay_image(image_np, gt_masks_list, [], None)
@@ -409,7 +352,6 @@ def evaluate(sam, eval_loader, device, output_dir,
                     os.makedirs(char_dir, exist_ok=True)
                     for j, (mask_np, conf) in enumerate(zip(pred_masks_list, norm_confs)):
                         char_img = Image.fromarray(image_np).convert("RGB")
-                        draw = ImageDraw.Draw(char_img)
                         mask_rgba = np.zeros((*mask_np.shape, 4), dtype=np.uint8)
                         mask_rgba[mask_np > 0] = (0, 255, 0, 128)
                         mask_overlay = Image.fromarray(mask_rgba, 'RGBA')
@@ -427,39 +369,6 @@ def evaluate(sam, eval_loader, device, output_dir,
                         draw.ellipse((x-3, y-3, x+3, y+3), fill='white', outline='black')
                         char_img.save(os.path.join(char_dir, f"char_{j:02d}.png"))
                 else:
-                    # --- NMS on predicted masks (best-by-dice) ---
-                    keep_indices = mask_nms_ios(pred_masks_list, confidences_list, ios_threshold=0.7)
-                    pred_masks_list_nms = [pred_masks_list[k] for k in keep_indices]
-                    norm_confs_nms = norm_confs[keep_indices]
-                    points_np_nms = points_np[keep_indices]
-                    bbox_np_nms = [bbox_np[k] for k in keep_indices] if bbox_np is not None else None
-
-                    # Per-image metrics (best-by-dice, AFTER NMS)
-                    m_dice_post = calculate_metrics(
-                        pred_masks_list_nms, gt_masks_list
-                    )
-                    per_image_results["dice_post_nms"].append(m_dice_post)
-
-                    # --- NMS on predicted masks (best-by-pred-iou) ---
-                    if pred_masks_prediou_list:
-                        keep_indices_prediou = mask_nms_ios(
-                            pred_masks_prediou_list, confidences_prediou_list, ios_threshold=0.5
-                        )
-                        pred_masks_prediou_list_nms = [pred_masks_prediou_list[k] for k in keep_indices_prediou]
-                    else:
-                        pred_masks_prediou_list_nms = []
-
-                    # Per-image metrics (best-by-pred-iou, AFTER NMS)
-                    m_prediou_post = calculate_metrics(
-                        pred_masks_prediou_list_nms, gt_masks_list
-                    )
-                    per_image_results["prediou_post_nms"].append(m_prediou_post)
-
-                    # --- Per-image console printout ---
-                    print(f"  [Image {idx:04d}] "
-                          f"dice_pre: iou={m_dice_pre['mean_iou']:.4f} dice={m_dice_pre['mean_dice']:.4f} | "
-                          f"prediou_pre(thr={pred_iou_threshold}): iou={m_prediou_pre['mean_iou']:.4f} dice={m_prediou_pre['mean_dice']:.4f}")
-
                     # Build visualization (best-by-dice post-NMS)
                     overlay_img = Image.fromarray(image_np).convert("RGBA")
                     overlay = Image.new('RGBA', overlay_img.size, (0, 0, 0, 0))
@@ -524,28 +433,18 @@ def evaluate(sam, eval_loader, device, output_dir,
     # ----------------------------------------------------------------
     # Aggregate metrics across all images
     # ----------------------------------------------------------------
-    def _aggregate(results_list, label):
-        """Print per-image-averaged metrics for one strategy."""
-        n = len(results_list)
-        if n == 0:
-            print(f"  [{label}] No images evaluated.")
-            return
-
+    n = len(per_image_results)
+    print(f"\n{'='*70}")
+    print("EVALUATION RESULTS (best-by-dice selection, POST-NMS)")
+    print(f"{'='*70}")
+    if n == 0:
+        print("  No images evaluated.")
+    else:
         keys = ["fg_iou", "fg_dice", "mean_iou", "mean_dice"]
-        avgs = {k: float(np.mean([r[k] for r in results_list])) for k in keys}
-
-        print(f"\n  [{label}]  ({n} images)")
+        avgs = {k: float(np.mean([r[k] for r in per_image_results])) for k in keys}
+        print(f"\n  ({n} images)")
         print(f"    fg_iou={avgs['fg_iou']:.4f}  fg_dice={avgs['fg_dice']:.4f}")
         print(f"    mean_iou={avgs['mean_iou']:.4f}  mean_dice={avgs['mean_dice']:.4f}")
-
-    print(f"\n{'='*70}")
-    print("EVALUATION RESULTS")
-    print(f"{'='*70}")
-    _aggregate(per_image_results["dice_pre_nms"],    "best-by-dice,    PRE-NMS ")
-    _aggregate(per_image_results["prediou_pre_nms"],  f"best-by-predIoU (thr={pred_iou_threshold}), PRE-NMS ")
-    if per_image_results["dice_post_nms"]:
-        _aggregate(per_image_results["dice_post_nms"],  "best-by-dice,    POST-NMS")
-        _aggregate(per_image_results["prediou_post_nms"], f"best-by-predIoU (thr={pred_iou_threshold}), POST-NMS")
     print(f"\n  Results saved to: {output_dir}")
     print(f"{'='*70}\n")
 
@@ -584,7 +483,7 @@ def main(args):
     # Run evaluation
     evaluate(sam, loader, device, args.output_dir,
          per_char_visualization=args.per_char_visualization,
-         pred_iou_threshold=args.pred_iou_threshold,
+         nms_ios_threshold=args.nms_ios_threshold,
          use_random_bbox_point=args.use_random_bbox_point)
 
 
@@ -598,8 +497,8 @@ if __name__ == '__main__':
     parser.add_argument('--use_line_masks', action='store_true')
     parser.add_argument('--use_bbox_prompt', action='store_true', default=True)
     parser.add_argument('--per_char_visualization', action='store_true', help='Store per-character prediction visualizations')
-    parser.add_argument('--pred_iou_threshold', type=float, default=0.3,
-                        help='Minimum predicted IoU score to keep a mask (pred-iou selection path)')
+    parser.add_argument('--nms_ios_threshold', type=float, default=0.7,
+                        help='Intersection-over-smaller threshold for NMS')
     parser.add_argument('--use_random_bbox_point', default=True, action='store_true', 
                     help='Use random point inside bbox instead of centroid as prompt')
     args = parser.parse_args()
