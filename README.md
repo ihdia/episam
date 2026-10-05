@@ -63,7 +63,7 @@ episam_dataset/
     ├── train/            # Associated centroids JSON files (train split)
     └── val/              # Associated centroids JSON files (val split)
 ```
-
+**Download our Dataset from [HuggingFace](https://huggingface.co/datasets/keyfinder08/EpiSAM_Inscriptions_Dataset) which contains inscription images, binary images, character segmentation masks and line segmentation masks.**
 ---
 
 ## 3. Dataset Preprocessing
@@ -144,7 +144,7 @@ python evaluate.py \
   --device cuda:0 \
   --pred_iou_threshold 0.3
 ```
-
+**Download the trained checkpoint from [HuggingFace](https://huggingface.co/keyfinder08/EpiSAM_Inscriptions_Project)**
 ---
 
 ## 6. Line Segmentation using 2-Hop Graph Classification
